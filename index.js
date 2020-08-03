@@ -52,9 +52,9 @@ io.on('connect',(socket)=>{
     //     io.to(room).emit('message', { user: name, text: message });
     //     cb();
     //   });
-      socket.on('turnPlayed', ({index,by}, cb) => {    
+      socket.on('turnPlayed', ({index,by,room}, cb) => {    
         console.log(index,by) 
-        io.to('room1').emit('opponentsPlay', { index,by });
+        io.to(room).emit('opponentsPlay', { index,by });
         cb();
       });
 })
