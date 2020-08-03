@@ -42,6 +42,8 @@ app.use(function(req, res, next) {
 require('./routes/auth')(app);
 
 ////////////////////////////////
+
+
 io.on('connect',(socket)=>{
     socket.on('join',({name,room},cb)=>{
         socket.join(room);
@@ -53,14 +55,12 @@ io.on('connect',(socket)=>{
     //     cb();
     //   });
       socket.on('turnPlayed', ({index,by,room}, cb) => {    
-        console.log(index,by) 
         io.to(room).emit('opponentsPlay', { index,by });
         cb();
       });
 })
 
 ///////////////////////////////
-
 
 
 app.get('/logout',(req,res)=>{
