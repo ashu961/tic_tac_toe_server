@@ -1,5 +1,7 @@
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJWT = require('passport-jwt').ExtractJwt;
 const mongoose = require("mongoose");
 const User = mongoose.model("users");
 
@@ -20,7 +22,7 @@ passport.use(new GoogleStrategy({
     proxy:true
   },
   async (accessToken, refreshToken, profile, done) => {
-    // console.log(profile);
+    // console.log(accessToken);
     const existinguser = await User.findOne({ googleID: profile.id });
     if (existinguser) {
       return done(null, existinguser);
@@ -29,3 +31,30 @@ passport.use(new GoogleStrategy({
     done(null, user);
   }
 ));
+
+// var opts = {}
+// opts.jwtFromRequest = function(req) { // tell passport to read JWT from cookies
+//     var token = null;
+//     if (req && req.cookies){
+//         token = req.cookies['jwt']
+//     }
+//     return token
+// }
+// opts.secretOrKey = 'secret'
+
+// main authentication, our app will rely on it
+
+  passport.use(new JwtStrategy({
+    jwtFromRequest : ExtractJWT.fromAuthHeaderAsBearerToken(),
+    secretOrKey : 'secret_token'
+}, function(jwt_payload, done) {
+     // called everytime a protected URL is being served
+    return done(null, jwt_payload.data)
+    // if (CheckUser(jwt_payload.data)) {
+    //     return done(null, jwt_payload.data)
+    // } else {
+    //     // user account doesnt exists in the DATA
+    //     return done(null, false)
+    // }
+}))
+
