@@ -64,13 +64,25 @@ io.on('connect', async (socket)=>{
             await GameData.updateOne({roomId:room},{$set:{playerTwo:user._id}})
             gameData = await GameData.findOne({roomId:room}).populate('playerOne').populate('playerTwo')
         }
-        socket.emit('gameData', { gameData });
+        io.to(room).emit('gameData', { gameData });
         cb();
     });
-    // socket.on('sendMessage', (message, cb) => {    
-    //     io.to(room).emit('message', { user: name, text: message });
-    //     cb();
-    //   });
+    socket.on('resetPressed', ({room}, cb) => {    
+        io.to(room).emit('reset');
+        cb();
+    });
+
+    socket.on('leavePressed', ({room}, cb) => {    
+        io.to(room).emit('leave');
+        cb();
+    });
+
+    socket.on('continuePressed', ({room}, cb) => {    
+        io.to(room).emit('continue');
+        cb();
+    });
+
+
       socket.on('turnPlayed', ({index,by,room}, cb) => {   
         io.to(room).emit('opponentsPlay', { index,by });
         cb();
@@ -78,7 +90,11 @@ io.on('connect', async (socket)=>{
 })
 
 ///////////////////////////////
-
+app.post('/gameData',async(req,res)=>{
+    const {room,score1,score2}=req.body;
+    let data=await GameData.updateOne({roomId:room},{$set:{playerOneScore:score1,playerTwoScore:score2}});
+    res.send(data);
+})
 
 app.get('/logout',(req,res)=>{
     req.session=null;

@@ -48,7 +48,6 @@ passport.use(new GoogleStrategy({
     jwtFromRequest : ExtractJWT.fromAuthHeaderAsBearerToken(),
     secretOrKey : 'secret_token'
 }, function(jwt_payload, done) {
-     // called everytime a protected URL is being served
     return done(null, jwt_payload.data)
     // if (CheckUser(jwt_payload.data)) {
     //     return done(null, jwt_payload.data)
